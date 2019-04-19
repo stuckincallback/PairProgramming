@@ -1,0 +1,39 @@
+{
+  "name": "pairprogramming",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node app.js",
+    "test": "node_modules/mocha/bin/mocha --exit"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "bcrypt-nodejs": "0.0.3",
+    "cheerio": "^1.0.0-rc.3",
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "ejs": "^2.6.1",
+    "express": "~4.16.0",
+    "express-session": "^1.15.6",
+    "http-errors": "~1.6.2",
+    "jade": "~1.11.0",
+    "mongoose": "^5.5.0",
+    "morgan": "~1.9.0",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4",
+    "socket-io": "^1.0.0",
+    "socket.io": "^2.2.0",
+    "static-favicon": "^2.0.0-alpha"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.2.1",
+    "mocha": "^6.1.4",
+    "mocha-junit-reporter": "^1.22.0",
+    "superagent": "^5.0.2",
+    "supertest": "^4.0.2"
+  }
+}

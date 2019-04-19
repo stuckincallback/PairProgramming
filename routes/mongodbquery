@@ -1,0 +1,3 @@
+db.questions.insert({"url":"https://www.hackerearth.com/practice/algorithms/sorting/insertion-sort/practice-problems/algorithm/the-rise-of-the-weird-things-1/",
+                     "finalTestCase":'10\n462 866 944 609 64 539 774 809 102 754',
+                     "finalSolution":"64 102 462 754 774 866 944 3966 539 609 809 1957"})
