@@ -16,7 +16,7 @@ mongoose.connect(dbConfig.url,{ useNewUrlParser: true },function(error){
 
 var app = express();
 var socket = require('socket.io');
-var server = app.listen(3001);
+var server = app.listen(process.env.PORT || 3001);
 var io = socket(server);
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
