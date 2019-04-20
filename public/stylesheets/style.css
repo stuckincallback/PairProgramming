@@ -4,7 +4,7 @@ body {
 }
 
 a {
-  color: #00B7FF;
+  color:black;
 }
 
 .form-signin{
@@ -103,11 +103,57 @@ ul.user-details{
   }
   .whitespace{
       white-space: pre-wrap;
+      background: linear-gradient(135deg, #085078, #85D8CE);
+      align-content: center;
   }
+  .mynk{
+      /* position: absolute; */
+      display:grid;
+    grid-template-columns: 33% 34% 33%;
+    grid-auto-rows: 100px;
+    /* grid-auto-rows: 50px; */
+    /* position: fixed; */
+    /* width: 900px;
+    height: 70px; */
+}
+/* #div2{
+    position:fixed;
+    height: 68px;
+    width: 400px;
+}
+#div1{
+    position:fixed;
+    height: 68px;
+    width: 400px;
+} */
+
 
   #question{
       padding: 20px;
   }
+  .out{
+      display:grid;
+      grid-column-gap: 1em;
+      grid-row-gap: 1em;
+      grid-template-columns: 20% 80%;
+      grid-auto-rows: 70px;
+  }
+  /* .out > div{
+      background: #888;
+  } */
+  .out1{
+    text-align: center;
+   
+    align-content: center;
+    background: #085078;
+  }
+  #opponentsResult{
+      font-family: Arial, Helvetica, sans-serif;
+      color: green;
+      font-size: 19px;
+      font-display: "SUCCESS";
+  }
+
   /* Start by setting display:none to make this hidden.
    Then we position it in relation to the viewport window
    with position:fixed. Width, height, top and left speak
@@ -121,7 +167,8 @@ ul.user-details{
     left:       0;
     height:     100%;
     width:      100%;
-    background: rgba( 255, 255, 255, .8 ) 
+    vertical-align: middle;
+    background: rgba( 255, 255, 255, .9 ) 
                 url('http://i.stack.imgur.com/FhHRx.gif') 
                 50% 50% 
                 no-repeat;
@@ -137,31 +184,46 @@ body.loading .modal {
    modal element will be visible */
 body.loading .modal {
     display: block;
+    vertical-align: middle;
 }
 
 /* The Modal (background) */
 .modalpopup {
     display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
+    
     z-index: 1; /* Sit on top */
     padding-top: 100px; /* Location of the box */
-    left: 0;
+    vertical-align: middle;
+    padding-top: 25px;
+    left: 30%;
+    right: 25%;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
+    float: right;
+    width: 35%; /* Full width */
+    height: 30%; /* Full height */
     overflow: auto; /* Enable scroll if needed */
-    background-color: rgb(0,0,0); /* Fallback color */
-    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    background-color: rgb(255, 255, 255, 0.9); /* Fallback color */
+    background-color: rgb(255, 255, 255, 0.9); /* Black w/ opacity */
+
+    
+   position: absolute;
+   
+   top: 50%; 
+   
+   margin-top: -120px;
   }
   
   /* Modal Content */
   .modalpopup-content {
     background-color: #fefefe;
-    margin: auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
+    
+    margin: 0% auto;
+    
+    border: 5px solid #888;
+    height: 100%;
+    width: 100%;
   }
+  
   
   /* The Close Button */
   .close {
@@ -177,35 +239,10 @@ body.loading .modal {
     text-decoration: none;
     cursor: pointer;
   }
-
-  #clockdiv{
-    font-family: sans-serif;
-    color: rgb(26, 23, 23);
-    display: inline-block;
-    font-weight: 100;
-    text-align: center;
-    font-size: 30px;
-}
-#clockdiv > div{
-    padding: 10px;
-    border-radius: 3px;
-    background: #00BF96;
-    display: inline-block;
-}
-
-#clockdiv div > span{
-    padding: 15px;
-    border-radius: 3px;
-    background: #00816A;
-    display: inline-block;
-}
-
-.smalltext{
+  .smalltext{
     padding-top: 5px;
     font-size: 16px;
 }
-
-
 .loader {
     border: 16px solid #f3f3f3; /* Light grey */
     border-top: 16px solid #3498db; /* Blue */
@@ -223,3 +260,4 @@ body.loading .modal {
   #stacktrace-wrapper{
       color:red;
   }
+
