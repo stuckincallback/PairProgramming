@@ -1,18 +1,90 @@
 <%- include('layout'); -%>
-<body>
-        <div class="row"> 
-             <button id = "cancelMatch" class="col-md-2" type="button" class="btn btn-primary" onclick="cancelChallenge()">Cancle</button>
 
-             <div id="clockdiv" class="col-md-2 pull-right">
-                    Minutes: <span class="minutes">Loading...</span><br>
-                    Seconds: <span class="seconds"></span>
-            </div>
-        </div>
-    <div class = "col-sm-6 col-md-4 col-md-offset-4">
+<body>
+
+
+    <div  class="mynk">
+
+           
+      <div id="div2"  >
+            <button id = "cancelMatch" class="col-md-2" type="button" class="btn btn-primary" onclick="cancelChallenge()">Leave CHallenge</button>
+
+            
+                
+           
+        
+            <select id="mode" size="1" style="align-content: flex-start; margin-left: 375px; margin-top: 80px;">
+                
+                <option value="ace/mode/c_cpp" data-lang="10">c_cpp</option>
+                                   
+                <option value="ace/mode/csharp" data-lang="16">csharp</option>
+                
+                <option value="ace/mode/erlang" data-lang="21">erlang</option>
+        
+                <option value="ace/mode/golang" data-lang="22">golang</option>
+              
+                <option value="ace/mode/haskell" data-lang="23">haskell</option>
+                
+                <option value="ace/mode/java" data-lang="27">java</option>
+                <option value="ace/mode/javascript" data-lang="29" selected>javascript</option>
+                
+                
+                <option value="ace/mode/ocaml" data-lang="31">ocaml</option>
+                <option value="ace/mode/pascal" data-lang="33">pascal</option>
+               
+                <option value="ace/mode/python" data-lang="34">python</option>
+              
+                <option value="ace/mode/ruby"data-lang="38">ruby</option>
+                
+                <option value="ace/mode/text" data-lang="43">text</option>
+            </select>
+
+      </div>
+      <!-- class = "col-sm-6 col-md-4 col-md-offset-4" -->
+        
+    <div  id="div3" >
+                     
+
                 <% if (user) { %>  
-                    <h1 class = "text-center login-title" >Welcome <%= user.username%>. Check your details below:</h1>
+                    <h1 class = "text-center login-title" >Welcome<b> <%= user.username%>.</b> Check your details below:</h1>
                 <% } %> 
-                <a href="/signout">SignOut</a>                        
+                    
+                                       
+    </div>
+        <div id="div1" >
+                <a href="/signout" style="align-content: flex-start; margin-left: 400px;color:black;">SignOut</a>
+            <div class="clock" style="margin-bottom: 4px;" >
+                            
+                    <div class="digit tenmin">
+                        <span class="base"></span>
+                        <div class="flap over front"></div>
+                        <div class="flap over back"></div>
+                        <div class="flap under"></div>
+                    </div>
+                
+                    <div class="digit min">
+                        <span class="base"></span>
+                        <div class="flap over front"></div>
+                        <div class="flap over back"></div>
+                        <div class="flap under"></div>
+                    </div>
+                    
+                    <div class="digit tensec">
+                        <span class="base"></span>
+                        <div class="flap over front"></div>
+                        <div class="flap over back"></div>
+                        <div class="flap under"></div>
+                    </div>
+                
+                    <div class="digit sec">
+                        <span class="base"></span>
+                        <div class="flap over front"></div>
+                        <div class="flap over back"></div>
+                        <div class="flap under"></div>
+                    </div>
+                    
+                </div> 
+        </div>
     </div>
     <div class = "col-md-4"></div>
     <div id = "wrapper">
@@ -31,20 +103,30 @@
         <input type="hidden" id="myField" name="text" value="{{this.text}}" />
     
         </div>   
-        <div id="result-wrapper">
-            <div id="result"><div class="loader">
-                <div class = "whitespace" id="status"></div>
+<div id="result-wrapper">      
+    <div id="result">
+                <div class="loader">
                 </div>
-                <div>Sample Input</div> 
-                <div class = "whitespace" id="sampleinput"></div>
-                <div>Sample Output</div>
-                <div class = "whitespace" id="sampleoutput"></div>
-                <div>Your Sample Output</div>
-                <div class = "whitespace" id="youroutput"></div>
-                <div>Oppentents Result Output</div>
-                <div class = "whitespace" id="opponentsResult"></div>
-            </div>
-        </div>
+                        <div class = "whitespace" id="status"></div>
+
+                        </div>
+                <div><span id=compiling></span></div>
+                <div class="out">
+
+                    <div class="out1" style="padding: 2px;"><b>Sample Input</b></div> 
+                    <div class = "whitespace" id="sampleinput"></div>
+                    <div class="out1"  style="padding: 2px"><b>Sample Output</b></div>
+                    <div class = "whitespace" id="sampleoutput"></div>
+                    <div class="out1" style="padding: 2px"><b>Your Output</b></div>
+                    <div class = "whitespace" id="youroutput"></div>
+                    <div class="out1" style="padding: 2px"><b>Opponent's Result</b></div>
+                    <div class = "whitespace"><div class = "whitespace" id="opponentsResult"></div></div>
+                
+                </div>
+                <div id="stacktrace" class = "whitespace"></div>
+      </div>  
+   </div>
+       
         <div id="stacktrace-wrapper">
                 <div id="stacktrace" class = "whitespace"></div>
                 <div id="errordescription" class="whitespace"></div>
@@ -73,13 +155,26 @@
       
     <script>
         var socket;
+        var langid;
         var editor;
         var editor2;
         var url ;
         //filter: blur(10px);
         $(document).ready(function(){
+
+            $("#mode").change(function(){
+                var element = $("option:selected", this);
+                var myTag = element.attr("data-lang");
+                 console.log(myTag);
+                 langid=myTag;
+                 console.log(element.val());
+                 editor.session.setMode(element.val());
+            })
+
+
             //$(".loader").hide()
-            $("#clockdiv").hide();
+            $(".clock").show();
+            
             $("#opponentsResult").hide();
             $("#result").hide();
             $("#stacktrace-wrapper").hide();
@@ -111,13 +206,13 @@
                 editor2.session.setMode("ace/mode/javascript");
                 var text = '';             
                     editor.session.on('change', function(delta) {
-                        console.log($("#clockdiv").attr("data-inMatch"));
+                        console.log($(".clock").attr("data-inMatch"));
                         text = editor.getValue();
                         data.name = name;
                         data.text = text;
                         data.socketid = socket.id;
                         //console.log(data);
-                        if($("#clockdiv").attr("data-inMatch") == 'true'){
+                        if($(".clock").attr("data-inMatch") == 'true'){
                             socket.emit('codeInEditor', data);  
                         }
                      });
@@ -219,9 +314,11 @@
                 });
 
                 socket.on('loadChallenge', function(response){
-                    $('#clockdiv').show();
+                    $('.clock').show();
+                    $('.clock').attr('data-inMatch', 'true');
                     $("#result").show();
                     $("#cancelMatch").show();
+
                     var filterVal = 'blur(10px)';
                     $('#editor2')
                     .css('filter',filterVal)
@@ -240,7 +337,8 @@
                         url: "/problem",
                         data: postData,
                         success: loadChallenge,
-                        dataType: 'json'
+                        dataType: 'json',
+                        
                     });
 
                 })
@@ -259,9 +357,8 @@
                 });
 
                 socket.on('timer', function(response)  {
-                    console.log($('#clockdiv .minutes').html());
-                    $('#clockdiv .minutes').text(response.time.minutes);
-                    $('#clockdiv .seconds').text(response.time.seconds);
+                    updateGroup('min', response.time.minutes, true);
+                    updateGroup('sec', response.time.seconds, true);
                 });
                 socket.on('opponentsResult', function(response){
                     $("#opponentsResult").html(response);
@@ -319,7 +416,8 @@
         }
 
        function compile(){
-            $('#status').text("Compiling...");
+            $('#status').text("");
+            $('#compiling').text("compiling...");
             $('.loader').show();
             let text = editor.getValue();
             let sampleInput = $('#sampleinput').text();
@@ -335,7 +433,8 @@
                 url: "/",
                 data: postData,
                 success: getCompileData,
-                dataType: 'json'
+                dataType: 'json',
+                langid: langid
             });
             //document.getElementById('myField').value = text;
             //console.log(document.getElementById('myField').value);
@@ -370,7 +469,8 @@
                 url: "/",
                 data: postData,
                 success: getCompileData,
-                dataType: 'json'
+                dataType: 'json',
+                langid: langid
             });
         }
         function connectToUser(obj){
@@ -404,6 +504,40 @@
         function responseFromFriend(data){
 
         }
+        function flipTo(digit, n){
+            var current = digit.attr('data-num');
+            digit.attr('data-num', n);
+            digit.find('.front').attr('data-content', current);
+            digit.find('.back, .under').attr('data-content', n);
+            digit.find('.flap').css('display', 'block');
+            setTimeout(function(){
+                digit.find('.base').text(n);
+                digit.find('.flap').css('display', 'none');
+            }, 350);
+        }
+
+        function jumpTo(digit, n){
+            digit.attr('data-num', n);
+            digit.find('.base').text(n);
+        }
+
+        function updateGroup(group, n, flip){
+            var digit1 = $('.ten'+group);
+            var digit2 = $('.'+group);
+            n = String(n);
+            if(n.length == 1) n = '0'+n;
+            var num1 = n.substr(0, 1);
+            var num2 = n.substr(1, 1);
+            if(digit1.attr('data-num') != num1){
+                if(flip) flipTo(digit1, num1);
+                else jumpTo(digit1, num1);
+            }
+            if(digit2.attr('data-num') != num2){
+                if(flip) flipTo(digit2, num2);
+                else jumpTo(digit2, num2);
+            }
+        }
+
     </script>
     
           
