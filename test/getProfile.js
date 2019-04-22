@@ -10,7 +10,7 @@ describe('Login', function(){
         .get('/home')                       
         .end(function(err, res){
             if (err) return done(err);
-            expect(res.statusCode).to.equal(200)
+            expect(res.statusCode).to.equal(302)
             //console.log(res.body);
             done()
         });
