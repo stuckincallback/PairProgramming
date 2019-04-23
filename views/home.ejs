@@ -7,13 +7,13 @@
 
            
       <div id="div2"  >
-            <button id = "cancelMatch" class="col-md-2" type="button" class="btn btn-primary" onclick="cancelChallenge()">Leave CHallenge</button>
+            <button id = "cancelMatch" class="col-md-2" type="button"  onclick="cancelChallenge()">Leave CHallenge</button>
 
             
                 
            
         
-            <select id="mode" size="1" style="align-content: flex-start; margin-left: 375px; margin-top: 80px;">
+            <select id="mode" size="1" style="align-content: flex-start;    float: right; margin-top: 80px;">
                 
                 <option value="ace/mode/c_cpp" data-lang="10">c_cpp</option>
                                    
@@ -105,11 +105,20 @@
         </div>   
 <div id="result-wrapper">      
     <div id="result">
-                <div class="loader">
+                <!-- <div class="loader">
                         <div class = "whitespace" id="status"></div>
 
-                        </div>
-                <div><span id=compiling></span></div>
+                        </div> -->
+                        <div class="container" style="align-items:flex-start" >   
+                          
+                                <button class="btn btn-primary" style="     color: #fff;
+                                background-color: #08507800;
+                                border-color: #007bff;">
+                                <span class="spinner-border spinner-border-sm" id="status"></span>
+                                Compiling..
+                                </button>
+                            
+                          </div>
                 <div class="out">
 
                     <div class="out1" style="padding: 2px;"><b>Sample Input</b></div> 
@@ -173,12 +182,13 @@
             $("#result").hide();
             $("#stacktrace").hide();
             $("#cancelMatch").hide();
-            $('.loader').hide();
+            $('.container').hide();
             var data = {
                 name: "",
                 text:"",
                 socketid:""
             }
+            // var userName = "<%= user.username%>"; ask
             var userName = "<%= user.username%>";
             console.log(userName);
             $('#compile').bind("click",compile);
@@ -194,7 +204,7 @@
                 editor = ace.edit("editor");
                 editor.setTheme("ace/theme/monokai");
                 editor.session.setMode("ace/mode/javascript");
-
+                
                 editor2 = ace.edit("editor2");
                 editor2.setTheme("ace/theme/monokai");
                 editor2.session.setMode("ace/mode/javascript");
@@ -202,7 +212,7 @@
                     editor.session.on('change', function(delta) {
                         console.log($(".clock").attr("data-inMatch"));
                         text = editor.getValue();
-                        data.name = name;
+                        data.name =  "<%= user.username%>";
                         data.text = text;
                         data.socketid = socket.id;
                         //console.log(data);
@@ -219,6 +229,8 @@
                     
                 socket.on('newUserConnected', function(response)  {
                     console.log(response);
+                    if($(".clock").attr("data-inMatch") == 'false')
+                    {
                     $( "#question" ).empty();
                     response.userArray.forEach(element => {
                         //if(element.userName != userName){
@@ -238,6 +250,7 @@
                         $('#question').append($newdiv1);
                         //}
                     });
+                }
                 });
 
                 socket.on('challengeReceived', function(response)  {
@@ -247,11 +260,11 @@
                 });
 
                 socket.on('challengeAccepted', function(response)  {
-                    $('#clockdiv').attr('data-inMatch', 'true');
+                    $('#clock').attr('data-inMatch', 'true');
                 });
 
                 socket.on('refreshUsersView', function(response)  {
-                    if($("#clockdiv").attr("data-inMatch") == 'true'){
+                    if($("#clock").attr("data-inMatch") == 'true'){
 
                     }else{
                         $( "#question" ).empty();
@@ -294,7 +307,7 @@
                         .css('mozFilter',filterVal)
                         .css('oFilter',filterVal)
                         .css('msFilter',filterVal);
-                        $('#clockdiv').attr('data-inMatch', 'false');
+                        $('#clock').attr('data-inMatch', 'false');
                 });
 
                 socket.on('hideSpinner', function(response)  {
@@ -381,17 +394,18 @@
                         .css('mozFilter',filterVal)
                         .css('oFilter',filterVal)
                         .css('msFilter',filterVal);
-                        $('#clockdiv').attr('data-inMatch', 'false');
+                        $('#clock').attr('data-inMatch', 'false');
                         socket.emit('cancleChallenge',{mySocketID:socket.id});
         }
 
        function compile(){
             $('#status').text("");
             $('#compiling').text("compiling...");
-            $('.loader').show();
+            $('.container').show();
             let text = editor.getValue();
             let sampleInput = $('#sampleinput').text();
             let sampleOutput  = $('#sampleoutput').text();
+            // $("#status").show().delay(5000).fadeOut();
             postData = {
                 code: text,
                 sampleInput: sampleInput,
@@ -410,7 +424,7 @@
             //console.log(document.getElementById('myField').value);
         }
         function getCompileData(data)  {
-            $('.loader').hide();
+            $('.container').hide();
             console.log(data)
             $('#status').text(data.compileData.status);
             $('#youroutput').text(data.compileData.result);
@@ -418,7 +432,7 @@
 
         function submit(){
             $('#status').text("Submitting...");
-            $('.loader').show();
+            $('.container').show();
             let text = editor.getValue();
             postData = {
                 code: text,
