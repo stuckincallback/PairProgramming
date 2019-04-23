@@ -7,13 +7,13 @@
 
            
       <div id="div2"  >
-            <button id = "cancelMatch" class="col-md-2" type="button" class="btn btn-primary" onclick="cancelChallenge()">Leave CHallenge</button>
+            <button id = "cancelMatch" class="col-md-2" type="button"  onclick="cancelChallenge()">Leave CHallenge</button>
 
             
                 
            
         
-            <select id="mode" size="1" style="align-content: flex-start; margin-left: 375px; margin-top: 80px;">
+            <select id="mode" size="1" style="align-content: flex-start;    float: right; margin-top: 80px;">
                 
                 <option value="ace/mode/c_cpp" data-lang="10">c_cpp</option>
                                    
@@ -105,11 +105,20 @@
         </div>   
 <div id="result-wrapper">      
     <div id="result">
-                <div class="loader">
+                <!-- <div class="loader">
                         <div class = "whitespace" id="status"></div>
 
-                        </div>
-                <div><span id=compiling></span></div>
+                        </div> -->
+                        <div class="container" style="align-items:flex-start" >   
+                          
+                                <button class="btn btn-primary" style="     color: #fff;
+                                background-color: #08507800;
+                                border-color: #007bff;">
+                                <span class="spinner-border spinner-border-sm" id="status"></span>
+                                Compiling..
+                                </button>
+                            
+                          </div>
                 <div class="out">
 
                     <div class="out1" style="padding: 2px;"><b>Sample Input</b></div> 
@@ -173,7 +182,7 @@
             $("#result").hide();
             $("#stacktrace").hide();
             $("#cancelMatch").hide();
-            $('.loader').hide();
+            $('.container').hide();
             var data = {
                 name: "",
                 text:"",
@@ -392,10 +401,11 @@
        function compile(){
             $('#status').text("");
             $('#compiling').text("compiling...");
-            $('.loader').show();
+            $('.container').show();
             let text = editor.getValue();
             let sampleInput = $('#sampleinput').text();
             let sampleOutput  = $('#sampleoutput').text();
+            // $("#status").show().delay(5000).fadeOut();
             postData = {
                 code: text,
                 sampleInput: sampleInput,
@@ -414,7 +424,7 @@
             //console.log(document.getElementById('myField').value);
         }
         function getCompileData(data)  {
-            $('.loader').hide();
+            $('.container').hide();
             console.log(data)
             $('#status').text(data.compileData.status);
             $('#youroutput').text(data.compileData.result);
@@ -422,7 +432,7 @@
 
         function submit(){
             $('#status').text("Submitting...");
-            $('.loader').show();
+            $('.container').show();
             let text = editor.getValue();
             postData = {
                 code: text,
