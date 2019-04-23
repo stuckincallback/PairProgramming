@@ -133,16 +133,16 @@ module.exports = function(passport, io){
 	  
 	  router.post('/', function(req, res) {
 		//console.log(req.body.code);
-		var source = req.body.code;
-		var type = req.body.type;
+		var source = req.body.data.code;
+		var type = req.body.data.type;
 		var testCase;
 		var testCaseResult;
         var mySocketID = req.body.socketid;
         var langid= req.body.langid;
 		if(type == 'compile'){
             
-			testCase = req.body.sampleInput;
-			testCaseResult = req.body.sampleOutput.trim();
+			testCase = req.body.data.sampleInput;
+			testCaseResult = req.body.data.sampleOutput.trim();
 			makeRequest(res, source, testCase, testCaseResult, mySocketID, langid)
 		}else if(type == 'submit'){
 			let url = req.body.url;
@@ -254,7 +254,7 @@ module.exports = function(passport, io){
 
 				io.in(opponentSocketID).emit('loadChallenge', {questionUrl:"https://www.hackerearth.com/practice/algorithms/sorting/insertion-sort/practice-problems/algorithm/the-rise-of-the-weird-things-1/"});
 				var starttime = new Date();
-				endtime = addMinutes(starttime, 1); // set to 1 minute
+				endtime = addMinutes(starttime, 10); // set to 1 minute
 				
 				var timeinterval = setInterval(function(){
 					var time = getTimeRemaining(endtime);
@@ -328,10 +328,10 @@ module.exports = function(passport, io){
 			};
 		}
 
-		function makeRequest(res, source, testCase, testCaseResult, mySocketID){
+		function makeRequest(res, source, testCase, testCaseResult, mySocketID, langid){
 			axios.post('https://api.judge0.com/submissions/', {
 			source_code: source,
-			language_id: 27,
+			language_id: langid,
 			stdin: testCase
 			})
 			.then(function (response) {
