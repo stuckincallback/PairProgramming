@@ -115,7 +115,7 @@
                                 background-color: #08507800;
                                 border-color: #007bff;">
                                 <span class="spinner-border spinner-border-sm" id="status"></span>
-                                Compiling..
+                                
                                 </button>
                             
                           </div>
@@ -264,6 +264,7 @@
                 });
 
                 socket.on('refreshUsersView', function(response)  {
+                    console.log('In Match'+$("#clock").attr("data-inMatch"));
                     if($("#clock").attr("data-inMatch") == 'true'){
 
                     }else{
@@ -399,7 +400,7 @@
         }
 
        function compile(){
-            $('#status').text("");
+            $('#status').text("Compiling...");
             $('#compiling').text("compiling...");
             $('.container').show();
             let text = editor.getValue();
@@ -410,15 +411,15 @@
                 code: text,
                 sampleInput: sampleInput,
                 sampleOutput: sampleOutput,
-                type:'compile'
+                type:'compile',
+                langid: langid
             }
             $.ajax({
                 type: "POST",
                 url: "/",
                 data: postData,
                 success: getCompileData,
-                dataType: 'json',
-                langid: langid
+                dataType: 'json'
             });
             //document.getElementById('myField').value = text;
             //console.log(document.getElementById('myField').value);
@@ -427,7 +428,11 @@
             $('.container').hide();
             console.log(data)
             $('#status').text(data.compileData.status);
-            $('#youroutput').text(data.compileData.result);
+            if(data.compileData.status == 'Accepted'){
+                $('#youroutput').text(data.compileData.status).css({'font-size' : '20px','color':'green'});
+            }else{
+                $('#youroutput').text(data.compileData.status).css({'font-size' : '20px','color':'red'});
+            }
         }
 
         function submit(){
@@ -438,15 +443,15 @@
                 code: text,
                 url: url,
                 type:'submit',
-                socketid: socket.id
+                socketid: socket.id,
+                langid: langid
             }
             $.ajax({
                 type: "POST",
                 url: "/",
                 data: postData,
                 success: getCompileData,
-                dataType: 'json',
-                langid: langid
+                dataType: 'json'
             });
         }
         function connectToUser(obj){

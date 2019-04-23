@@ -132,17 +132,17 @@ module.exports = function(passport, io){
 	  })
 	  
 	  router.post('/', function(req, res) {
-		//console.log(req.body.code);
-		var source = req.body.data.code;
-		var type = req.body.data.type;
+		console.log(req.body);
+		var source = req.body.code;
+		var type = req.body.type;
 		var testCase;
 		var testCaseResult;
-        var mySocketID = req.body.socketid;
-        var langid= req.body.langid;
+    var mySocketID = req.body.socketid;
+    var langid= req.body.langid;
 		if(type == 'compile'){
             
-			testCase = req.body.data.sampleInput;
-			testCaseResult = req.body.data.sampleOutput.trim();
+			testCase = req.body.sampleInput;
+			testCaseResult = req.body.sampleOutput.trim();
 			makeRequest(res, source, testCase, testCaseResult, mySocketID, langid)
 		}else if(type == 'submit'){
 			let url = req.body.url;
@@ -153,8 +153,8 @@ module.exports = function(passport, io){
 				dbo.collection("question").findOne({ 'url': url }, function(err, questiongot) {
 					if (err) console.log(err);
 					//console.log(questiongot);
-					testCase = questiongot.finalTestCase.replace('/\\n/','/\n/');;
-					testCase = '10\n570 751 980 995 529 940 212 848 718 515'
+					testCase = questiongot.finalTestCase.replace('\\n','\n');;
+					//testCase = '10\n570 751 980 995 529 940 212 848 718 515'
 					testCaseResult = questiongot.finalSolution.trim();
 					//console.log(testCase);
 					makeRequest(res, source, testCase, testCaseResult, mySocketID,langid);
@@ -335,49 +335,49 @@ module.exports = function(passport, io){
 			stdin: testCase
 			})
 			.then(function (response) {
-			let token = response.data.token;
-			axios.get('https://api.judge0.com/submissions/'+token)
-			.then(function(response){
-				//console.log(response);
-				//console.log(response.data.status);
-				if(response.data.status.id == 1){
-				setTimeout(function() {
-					axios.get('https://api.judge0.com/submissions/'+token)
-					.then(function(response){
-						console.log("Response from judnge 0");
-						console.log(response)
-						compileData = {}
-						if(response.data.status.id == 1){
-							if(response.data.stdout != null){
-								compileData.result = response.data.stdout.trim();
-							}
-							//console.log('Result =='+compileData.result.localeCompare(testCaseResult));
-							console.log(compileData.result);
-							console.log(testCaseResult);
-							console.log(compileData.result === testCaseResult);
-							if(compileData.result === testCaseResult){
-								compileData.status = "Accepted"
-								io.in(mySocketID).emit('opponentsResult', 'Accepted');
-	
-							}else{
-								compileData.status = "Failed"
-								io.in(mySocketID).emit('opponentsResult', 'Failed');
-	
-							}
-							compileData.statusid = '1';
-						}else {
-							compileData.status = "Compilation failed";
-							compileData.statusid = '11';
-							compileData.stderr = response.data.stderr;
-							compileData.errDescription =response.data.status.description;
-						}
-						res.json({
-						compileData: compileData
-						});
+				let token = response.data.token;
+				axios.get('https://api.judge0.com/submissions/'+token)
+				.then(function(response){
+					//console.log(response);
+					console.log('First submisson'+response.data);
+					if(response.data.status.id == 1 || response.data.status.id == 2){
+						setTimeout(function() {
+							axios.get('https://api.judge0.com/submissions/'+token)
+							.then(function(response){
+								console.log("Response from judnge 0"+response.data.status.id);
+								console.log('Second submisson'+response.data)
+								compileData = {}
+								if(response.data.status.id == 3){
+									if(response.data.stdout != null){
+										compileData.result = response.data.stdout.trim();
+									}
+									//console.log('Result =='+compileData.result.localeCompare(testCaseResult));
+									console.log(compileData.result);
+									console.log(testCaseResult);
+									console.log(compileData.result === testCaseResult);
+									if(compileData.result === testCaseResult){
+										compileData.status = "Accepted"
+										io.in(mySocketID).emit('opponentsResult', 'Accepted');
+			
+									}else{
+										compileData.status = "Failed"
+										io.in(mySocketID).emit('opponentsResult', 'Failed');
+			
+									}
+									compileData.statusid = '1';
+								}else {
+									compileData.status = "Compilation failed";
+									compileData.statusid = '11';
+									compileData.stderr = response.data.stderr;
+									compileData.errDescription =response.data.status.description;
+								}
+								res.json({
+								compileData: compileData
+								});
+							})
+						}, 5000);
+					}
 				})
-				}, 5000);
-				}
-			})
 			})
 			.catch(function (error) {
 			console.log(error);
