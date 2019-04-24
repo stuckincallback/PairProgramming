@@ -7,13 +7,13 @@
 
            
       <div id="div2"  >
-            <button id = "cancelMatch" class="col-md-2" type="button"  onclick="cancelChallenge()">Leave CHallenge</button>
+            <button id = "cancelMatch" class="col-md-2 btn btn-danger btn-lg" type="button"  style="width: 170px;" onclick="cancelChallenge()">Leave Challenge</button>
 
             
                 
            
         
-            <select id="mode" size="1" style="align-content: flex-start;    float: right; margin-top: 80px;">
+            <select id="mode" size="1" class="mdb-select" style="align-content: flex-start;    float: right; margin-top: 80px;">
                 
                 <option value="ace/mode/c_cpp" data-lang="10">c_cpp</option>
                                    
@@ -52,7 +52,7 @@
                                        
     </div>
         <div id="div1" >
-                <a href="/signout" style="align-content: flex-start; margin-left: 400px;color:black;">SignOut</a>
+            <button class="btn btn-primary pull-right"onclick="window.location.href='/signout'">SignOut</button>
             <div class="clock" style="margin-bottom: 4px;" >
                             
                     <div class="digit tenmin">
@@ -100,7 +100,9 @@
     <div id="buttons">
         <input id = "compile" type="button" name="Compile" value="compile" onclick="compile()"/>
         <input type="button" name="Submit" value="submit"  onclick="submit()"/>
+        <input type="button" name="Custom" text="newtext"  value="custom I/P" onclick="switchVisible(this)"/>
         <input type="hidden" id="myField" name="text" value="{{this.text}}" />
+
     
         </div>   
 <div id="result-wrapper">      
@@ -109,17 +111,8 @@
                         <div class = "whitespace" id="status"></div>
 
                         </div> -->
-                        <div class="container" style="align-items:flex-start" >   
-                          
-                                <button class="btn btn-primary" style="     color: #fff;
-                                background-color: #08507800;
-                                border-color: #007bff;">
-                                <span class="spinner-border spinner-border-sm" id="status"></span>
-                                
-                                </button>
-                            
-                          </div>
-                <div class="out">
+                <img class="spinner" style="align-items:flex-start" src="/images/spinner.gif"/>
+                <div id = "standardIO" class="out">
 
                     <div class="out1" style="padding: 2px;"><b>Sample Input</b></div> 
                     <div class = "whitespace" id="sampleinput"></div>
@@ -131,7 +124,14 @@
                     <div class = "whitespace"><div class = "whitespace" id="opponentsResult"></div></div>
                 
                 </div>
-                <div id="stacktrace" class = "whitespace"></div>
+                <div id = "customcompile">
+                    <textarea id = "area1" class = "area2" placeholder="Enter your Input"></textarea>
+                    <textarea id = "area3" class = "area4" placeholder="Enter your Input"></textarea>
+                </div>
+                <div id="stacktrace" class = "whitespace">
+                    <div id="errorDesc"></div>
+                    <div id = "stderr"></div>
+                </div>
             </div>
  </div>            
         <div class="modal"></div>
@@ -162,6 +162,8 @@
         var editor;
         var editor2;
         var url ;
+        var cust =0;
+        var isCustomCompileClicked = false;
         //filter: blur(10px);
         $(document).ready(function(){
 
@@ -181,8 +183,11 @@
             $("#opponentsResult").hide();
             $("#result").hide();
             $("#stacktrace").hide();
+            $("#standardIO").hide();
+            $("#customcompile").hide();
             $("#cancelMatch").hide();
-            $('.container').hide();
+            $('.spinner').hide();
+            $('.clock').attr('data-inMatch', 'false');
             var data = {
                 name: "",
                 text:"",
@@ -254,23 +259,22 @@
                 });
 
                 socket.on('challengeReceived', function(response)  {
-                    console.log(response);
+                    console.log('challengeReceived'+response);
                     $('#popudbody').text('Hi '+response.name+' wants to do programming with you')
                     $("#myModal").css("display", "block");
                 });
 
                 socket.on('challengeAccepted', function(response)  {
-                    $('#clock').attr('data-inMatch', 'true');
+                    $('.clock').attr('data-inMatch', 'true');
                 });
-
                 socket.on('refreshUsersView', function(response)  {
                     console.log('In Match'+$("#clock").attr("data-inMatch"));
-                    if($("#clock").attr("data-inMatch") == 'true'){
+                    if($(".clock").attr("data-inMatch") == 'true'){
 
                     }else{
                         $( "#question" ).empty();
                         response.userArray.forEach(element => {
-                            //if(element.userName != userName){
+                            if(element.userName != userName){
                             // $('#question').append($("#batchInsert").html());
                                 //$('#user-name').text(element.userName)
                                 var $newdiv1 = $('<div class="chat-users">'+
@@ -285,7 +289,8 @@
                                                         '</div>'+
                                                     '<div>' );
                             
-                            $('#question').append($newdiv1);
+                                $('#question').append($newdiv1);
+                            }
                            
                         });
                         console.log($(" #question #userStatus"));
@@ -308,7 +313,7 @@
                         .css('mozFilter',filterVal)
                         .css('oFilter',filterVal)
                         .css('msFilter',filterVal);
-                        $('#clock').attr('data-inMatch', 'false');
+                        $('.clock').attr('data-inMatch', 'false');
                 });
 
                 socket.on('hideSpinner', function(response)  {
@@ -320,7 +325,8 @@
                     $('.clock').attr('data-inMatch', 'true');
                     $("#result").show();
                     $("#cancelMatch").show();
-
+                    $("#customcompile").hide();
+                    $('#stacktrace').hide();
                     var filterVal = 'blur(10px)';
                     $('#editor2')
                     .css('filter',filterVal)
@@ -374,6 +380,7 @@
                         $("body").removeClass("loading");
                         $('#question').empty();
                         $('#question').html(data.statement);
+                        $("#standardIO").show();
                         $('#sampleinput').html(data.sampleInput);
                         $('#sampleoutput').html(data.sampleOutput);
        }
@@ -395,14 +402,14 @@
                         .css('mozFilter',filterVal)
                         .css('oFilter',filterVal)
                         .css('msFilter',filterVal);
-                        $('#clock').attr('data-inMatch', 'false');
+                        $('.clock').attr('data-inMatch', 'false');
                         socket.emit('cancleChallenge',{mySocketID:socket.id});
         }
 
        function compile(){
+           if(!(isCustomCompileClicked)){
             $('#status').text("Compiling...");
-            $('#compiling').text("compiling...");
-            $('.container').show();
+            $('.spinner').show();
             let text = editor.getValue();
             let sampleInput = $('#sampleinput').text();
             let sampleOutput  = $('#sampleoutput').text();
@@ -421,23 +428,61 @@
                 success: getCompileData,
                 dataType: 'json'
             });
+           }else{
+            $('#status').text("");
+                $('#status').text("CUSTMCHECK.");
+                $('.spinner').show();
+                let sampleOutput= 10 ;
+                let text = editor.getValue();
+                let sampleInput =document.getElementById("area1").value;            
+                console.log(sampleInput);
+
+                postData = {
+                    code: text,
+                    sampleInput: sampleInput,
+                    sampleOutput: sampleOutput,
+                    type:'customCompile'
+                }
+                $.ajax({
+                    type: "POST",
+                    url: "/",
+                    data: postData,
+                    success: getCompileData,
+                    dataType: 'json',
+                    langid: langid
+                });
+
+           }
             //document.getElementById('myField').value = text;
             //console.log(document.getElementById('myField').value);
         }
+
         function getCompileData(data)  {
-            $('.container').hide();
+            $('.spinner').hide();
             console.log(data)
-            $('#status').text(data.compileData.status);
-            if(data.compileData.status == 'Accepted'){
-                $('#youroutput').text(data.compileData.status).css({'font-size' : '20px','color':'green'});
+            if(data.compileData.statusid == 1){
+                $('#status').text(data.compileData.status);
+                if(data.compileData.status == 'Accepted'){
+                    $('#youroutput').text(data.compileData.status).css({'font-size' : '20px','color':'green'});
+                }else{
+                    $('#youroutput').text(data.compileData.status).css({'font-size' : '20px','color':'red'});
+                }
+            }else if(data.compileData.statusid == 2){
+                    $('#area3').text(data.compileData.result)
             }else{
-                $('#youroutput').text(data.compileData.status).css({'font-size' : '20px','color':'red'});
-            }
+                setDisplayBlock('result-wrapper')
+                $('#result').css('display', 'block');
+                $('#standardIO').css('display', 'none');
+                $('#customcompile').css('display', 'none');
+                $('#stacktrace').css('display', 'block');
+                $('#errorDesc').text(data.compileData.errDescription)
+                $('#stderr').text(data.compileData.stderr)
+            }    
         }
 
         function submit(){
             $('#status').text("Submitting...");
-            $('.container').show();
+            $('.spinner').show();
             let text = editor.getValue();
             postData = {
                 code: text,
@@ -454,6 +499,60 @@
                 dataType: 'json'
             });
         }
+
+        function myFunction() {
+            if(cust==0){
+                cust=1;
+                var x = document.createElement("TEXTAREA");
+                x.setAttribute("id", "area1");
+                x.setAttribute("class", "area2");
+                x.setAttribute("placeholder", "Enter your Input");
+                
+
+                var y = document.createElement("TEXTAREA");
+                y.setAttribute("id", "area3");
+                y.setAttribute("class", "area4");
+                y.setAttribute("placeholder", "Genrated Output");
+
+                var t = document.createTextNode("");
+                x.appendChild(t);
+                document.body.appendChild(x);
+                y.appendChild(t);
+                document.body.appendChild(y);
+                
+            }
+           
+            }
+
+            function switchVisible() {
+                isCustomCompileClicked = !isCustomCompileClicked;
+                if(isCustomCompileClicked){
+                     $('#result').css('display', 'block');
+                     $('#standardIO').css('display', 'none');
+                     $('#customcompile').css('display', 'block');
+                     $('#stacktrace').css('display', 'none');
+                }else{
+                    $('#customcompile').css('display', 'none');
+                    if($('.clock').attr('data-inMatch') == 'true'){
+                        $('#result').css('display', 'block');
+                        $('#standardIO').css('display', 'block');
+                    }
+                }
+                //setDisplayBlock('area1')
+                //setDisplayBlock('area3')
+                //setDisplaykNone('stacktrace')
+                //setDisplaykNone('standardIO')
+            }
+
+
+            function setDisplaykNone(divName){
+                document.getElementById(divName).style.display = 'none';
+            }
+
+            function setDisplayBlock(divName){
+                document.getElementById(divName).style.display = 'block';
+            }
+
         function connectToUser(obj){
             var friendsId = obj.getAttribute('data-myid');
             var privateConnection ={

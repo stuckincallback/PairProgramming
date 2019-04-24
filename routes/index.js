@@ -7,6 +7,21 @@ var mongooseQuestions = require('mongoose');
 var question;
 const MongoClient = require('mongodb').MongoClient;
 const uri = "mongodb+srv://root:root@cluster0-4zdqp.mongodb.net/QuestionsDB?retryWrites=true";
+var judge0StatusMap = new Map();
+initializeStatuses(judge0StatusMap);
+
+function initializeStatuses(statusMap){
+	statusMap.set(4,{"description":"Wrong Answer"});
+	statusMap.set(5,{"description":"Time Limit Exceeded"});
+	statusMap.set(6,{"description":"Compilation Error"});
+	statusMap.set(7,{"description":"Runtime Error (SIGSEGV)"});
+	statusMap.set(8,{"description":"Runtime Error (SIGXFSZ)"});
+	statusMap.set(9,{"description":"Runtime Error (SIGFPE)"});
+	statusMap.set(10,{"description":"Runtime Error (SIGABRT)"});
+	statusMap.set(11,{"description":"Runtime Error (NZEC)"});
+	statusMap.set(12,{"description":"Runtime Error (Other)"});
+	statusMap.set(13,{"description":"Internal Error"});
+}
 /*const client = new MongoClient(uri, { useNewUrlParser: true });
 client.connect(err => {
 	question = client.db("test").collection("devices");
@@ -140,7 +155,7 @@ module.exports = function(passport, io){
     var mySocketID = req.body.socketid;
     var langid= req.body.langid;
 		if(type == 'compile'){
-            
+            console.log('inside Compile');
 			testCase = req.body.sampleInput;
 			testCaseResult = req.body.sampleOutput.trim();
 			makeRequest(res, source, testCase, testCaseResult, mySocketID, langid)
@@ -175,7 +190,15 @@ module.exports = function(passport, io){
 			  });*/
 			//testCase = req.body.sampleInput;
 			//testCaseResult = req.body.sampleOutput.trim();
+		}else if(type=='customCompile'){
+			console.log('inside customCompile');
+			testCase = req.body.sampleInput;
+			testCaseResult = req.body.sampleOutput.trim();
+			console.log(testCase);
+			console.log(testCaseResult);
+			makeRequest(res, source, testCase, testCaseResult, mySocketID, langid)
 		}
+
 		//testCase = '10\n570 751 980 995 529 940 212 848 718 515';
 		//console.log('testcase is'+ testCase);
 		
@@ -252,6 +275,19 @@ module.exports = function(passport, io){
 					io.sockets.emit('refreshUsersView',{userArray});
 				}
 
+				MongoClient.connect(uri, function(err, db) {
+					if (err) throw err;
+						var dbo = db.db("QuestionsDB");
+					 var urlarray = dbo.collection("question").find({},{url:1}).toArray()
+					 console.log(urlarray.length);
+					 console.log(urlarray[0])
+					 //.forEach(function( url){
+					//		console.log('--------------------------------')
+					//		console.log(url);
+					//	}
+					//)
+					db.close();
+				});
 				io.in(opponentSocketID).emit('loadChallenge', {questionUrl:"https://www.hackerearth.com/practice/algorithms/sorting/insertion-sort/practice-problems/algorithm/the-rise-of-the-weird-things-1/"});
 				var starttime = new Date();
 				endtime = addMinutes(starttime, 10); // set to 1 minute
@@ -329,6 +365,16 @@ module.exports = function(passport, io){
 		}
 
 		function makeRequest(res, source, testCase, testCaseResult, mySocketID, langid){
+			if(source.length <= 10){
+				compileData = {}
+				compileData.status = "Compilation failed";
+				compileData.statusid = '11';
+				compileData.stderr = "Empty source code"
+				compileData.errDescription ="Empty Submission not allowed";
+				res.json({
+					compileData: compileData
+				});
+			}
 			axios.post('https://api.judge0.com/submissions/', {
 			source_code: source,
 			language_id: langid,
@@ -355,21 +401,28 @@ module.exports = function(passport, io){
 									console.log(compileData.result);
 									console.log(testCaseResult);
 									console.log(compileData.result === testCaseResult);
-									if(compileData.result === testCaseResult){
-										compileData.status = "Accepted"
-										io.in(mySocketID).emit('opponentsResult', 'Accepted');
-			
+									if(testCaseResult != 10){
+										if(compileData.result === testCaseResult){
+											compileData.status = "Accepted"
+											io.in(mySocketID).emit('opponentsResult', 'Accepted');
+				
+										}else{
+											compileData.status = "Failed"
+											io.in(mySocketID).emit('opponentsResult', 'Failed');
+				
+										}
+										compileData.statusid = '1'; // For compile/submit button output
 									}else{
-										compileData.status = "Failed"
-										io.in(mySocketID).emit('opponentsResult', 'Failed');
-			
-									}
-									compileData.statusid = '1';
+										compileData.statusid = '2'; // For custom compile output
+									}	
 								}else {
 									compileData.status = "Compilation failed";
 									compileData.statusid = '11';
 									compileData.stderr = response.data.stderr;
-									compileData.errDescription =response.data.status.description;
+									if(judge0StatusMap.has(response.data.status.id))
+										compileData.errDescription =judge0StatusMap.get(response.data.status.id).description;
+									else
+									compileData.errDescription = "Some error occured";
 								}
 								res.json({
 								compileData: compileData
@@ -380,7 +433,15 @@ module.exports = function(passport, io){
 				})
 			})
 			.catch(function (error) {
-			console.log(error);
+				compileData = {}
+				compileData.status = "Compilation failed";
+				compileData.statusid = '11';
+				compileData.stderr = error
+				compileData.errDescription =error;
+				res.json({
+					compileData: compileData
+				});	
+			console.log('*****************OUTERLEVEL*******************'+error);
 			});
 		}
 	return router;
