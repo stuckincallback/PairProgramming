@@ -26,20 +26,21 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.use(favicon());
+const filterSecret = format((info, opts) => {
+    console.log('-----------------------------')
+    console.log(info)
+    //info.message = info.message.replace('Content-Length', 'su*** se****');
+    return info;
+  });
 
 const logger = createLogger({
-    
     transports: [
         new transports.Console({
-            format: format.json(),
-            level: 'info',
-            handleExceptions: true,
-            json: true,
-            colorize: true
+            format: format.splat()
         }),
         
         new transports.Http({
-            format: format.logstash(),
+            format: format.json(),
             host:'localhost',
             port:20890
         }),
@@ -47,11 +48,11 @@ const logger = createLogger({
     exitOnError: false
 })
 
-logger.stream = {
+/*logger.stream = {
     write: function(message, encoding){
         logger.info(message);
     }
-};
+};*/
 //new LogstashTransport({host: 'localhost', port: 5044}),
 /*const logger = require('winston-logstash-transport').createLogger(null, {
     application: 'website-ssr-prod',
@@ -66,7 +67,7 @@ logger.stream = {
         })
     ]
   })*/
-app.use(require("morgan")("combined", { "stream": logger.stream }));
+//app.use(require("morgan")("combined", { "stream": logger.stream }));
 //app.use(logger('combined'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

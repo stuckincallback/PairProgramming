@@ -74,15 +74,11 @@ module.exports = function(passport, io, logger){
 	router.get('/', function(req, res) {
     	// Display the Login page with any flash message, if any
 		res.render('index', { message: req.flash('message') });
-		logger.log({message:{
-								level: 'info',
-								message: 'Hello distributed log files!'
-							}
-		});
-		logger.debug({
+		logger.info('root page');
+		/*logger.info({myjson:{
 			level: 'debug',
-			message: 'Hello distributed error!'
-		});
+			message: 'some random message two!'
+		}});*/
 	});
 
 	/* Handle Login POST */
@@ -106,6 +102,7 @@ module.exports = function(passport, io, logger){
 
 	/* GET Home Page */
 	router.get('/home', isAuthenticated, function(req, res){
+		logger.info('home page')
 		res.render('home', { user: req.user });
 	});
 
@@ -246,6 +243,8 @@ module.exports = function(passport, io, logger){
 				//io.sockets.emit('newUserConnected', {userArray});
 				io.sockets.emit('refreshUsersView', {userArray});
 			}
+
+			logger.info('OnlineUsers:'+ onlineUser.size);
 		});
 		socket.on('disconnect', function(){
 			console.log('socket disconnected'+socket.id);
