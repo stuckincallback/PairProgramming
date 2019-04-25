@@ -1,12 +1,12 @@
 var expect = require('chai').expect;
 var app = require('../app');
 var request = require('supertest');
-var server = request.agent('http://localhost:3001');
+var server = request.agent('http://localhost:3000');
 
 describe('Login', function(){
     it('login', loginUser());
     it('login check', function(done){
-    server
+    request(app)
         .get('/home')                       
         .end(function(err, res){
             if (err) return done(err);
@@ -16,8 +16,8 @@ describe('Login', function(){
         });
     });
     
-    it('fake login check', function(done){
-        server
+    it('fake login attempt', function(done){
+        request(app)
             .post('/login')
             .send({ username: 'abcdrrrr', password: 'abcd' })
             .expect(302)
@@ -30,7 +30,7 @@ describe('Login', function(){
             }
         });
 
-    it('logout check', function(done){
+    it('Signout Check', function(done){
         request(app)
             .get('/signout')                       
             .end(function(err, res){
