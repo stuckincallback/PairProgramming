@@ -1,10 +1,13 @@
 var express = require('express');
 var path = require('path');
 var favicon = require('static-favicon');
-var logger = require('morgan');
+//var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var winston = require('winston');
+const { createLogger, format, transports } = winston;
+var logtransport = require('winston-logstash-transport');
+const {LogstashTransport} = logtransport;
 var dbConfig = require('./db');
 var mongoose = require('mongoose');
 
@@ -23,9 +26,52 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 app.use(favicon());
-app.use(logger('dev'));
+
+const logger = createLogger({
+    
+    transports: [
+        new transports.Console({
+            format: format.json(),
+            level: 'info',
+            handleExceptions: true,
+            json: true,
+            colorize: true
+        }),
+        
+        new transports.Http({
+            format: format.logstash(),
+            host:'localhost',
+            port:20890
+        }),
+    ],
+    exitOnError: false
+})
+
+logger.stream = {
+    write: function(message, encoding){
+        logger.info(message);
+    }
+};
+//new LogstashTransport({host: 'localhost', port: 5044}),
+/*const logger = require('winston-logstash-transport').createLogger(null, {
+    application: 'website-ssr-prod',
+    logstash: {host: 'localhost', port: 5044},
+    transports: [
+        new transports.Console({
+            format: format.logstash(),
+            level: 'debug',
+            handleExceptions: true,
+            json: false,
+            colorize: true
+        })
+    ]
+  })*/
+app.use(require("morgan")("combined", { "stream": logger.stream }));
+//app.use(logger('combined'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -45,7 +91,7 @@ app.use(flash());
 // Initialize Passport
 var initPassport = require('./passport/init');
 initPassport(passport);
-var routes = require('./routes/index')(passport, io);
+var routes = require('./routes/index')(passport, io , logger);
 app.use('/', routes);
 
 /// catch 404 and forward to error handler

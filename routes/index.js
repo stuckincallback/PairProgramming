@@ -68,12 +68,21 @@ var isAuthenticated = function (req, res, next) {
 	res.redirect('/');
 }
 
-module.exports = function(passport, io){
+module.exports = function(passport, io, logger){
 
 	/* GET login page. */
 	router.get('/', function(req, res) {
     	// Display the Login page with any flash message, if any
 		res.render('index', { message: req.flash('message') });
+		logger.log({message:{
+								level: 'info',
+								message: 'Hello distributed log files!'
+							}
+		});
+		logger.debug({
+			level: 'debug',
+			message: 'Hello distributed error!'
+		});
 	});
 
 	/* Handle Login POST */

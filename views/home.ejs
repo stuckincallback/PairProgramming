@@ -304,8 +304,9 @@
                 });
 
                 socket.on('challengeCancelled', function(response){
-                        $("#clockdiv").hide();
+                        $(".clock").hide();
                         $("#cancelMatch").hide();
+                        $('#result').hide();
                         var filterVal = 'blur(0px)';
                         $('#editor2')
                         .css('filter',filterVal)
@@ -393,7 +394,7 @@
         }
 
         function cancelChallenge(){
-                        $("#clockdiv").hide();
+                        $(".clock").hide();
                         $("#cancelMatch").hide();
                         var filterVal = 'blur(0px)';
                         $('#editor2')
@@ -403,7 +404,7 @@
                         .css('oFilter',filterVal)
                         .css('msFilter',filterVal);
                         $('.clock').attr('data-inMatch', 'false');
-                        socket.emit('cancleChallenge',{mySocketID:socket.id});
+                        socket.emit('cancelChallenge',{mySocketID:socket.id});
         }
 
        function compile(){
