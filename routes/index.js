@@ -74,8 +74,10 @@ module.exports = function(passport, io, logger){
 	router.get('/', function(req, res) {
     	// Display the Login page with any flash message, if any
 		res.render('index', { message: req.flash('message') });
-		logger.info('root page');
-		/*logger.info({myjson:{
+		//logger.info('whichpage=root');
+		console.log('whichpage=root');
+		/*
+		logger.info({myjson:{
 			level: 'debug',
 			message: 'some random message two!'
 		}});*/
@@ -90,11 +92,13 @@ module.exports = function(passport, io, logger){
 
 	/* GET Registration Page */
 	router.get('/signup', function(req, res){
+		console.log('whichpage=signup');
 		res.render('register',{message: req.flash('message')});
 	});
 
 	/* Handle Registration POST */	
 	router.post('/signup', passport.authenticate('signup', {
+		
 		successRedirect: '/home',
 		failureRedirect: '/signup',
 		failureFlash : true  
@@ -102,12 +106,14 @@ module.exports = function(passport, io, logger){
 
 	/* GET Home Page */
 	router.get('/home', isAuthenticated, function(req, res){
-		logger.info('home page')
+		//logger.info('whichpage=home');
+		console.log('whichpage=home');
 		res.render('home', { user: req.user });
 	});
 
 	/* Handle Logout */
 	router.get('/signout', function(req, res) {
+		console.log('whichpage=signout');
 		req.logout();
 		res.redirect('/');
 	});
@@ -131,6 +137,7 @@ module.exports = function(passport, io, logger){
 	});
 
 	router.post('/problem',(req,res)=>{
+		console.log('whichpage=problem');
 		let url = req.body.url;
 		//console.log('url is'+url);
 		rp(url)
@@ -244,7 +251,8 @@ module.exports = function(passport, io, logger){
 				io.sockets.emit('refreshUsersView', {userArray});
 			}
 
-			logger.info('OnlineUsers:'+ onlineUser.size);
+			//logger.info('OnlineUsers='+ onlineUser.size);
+			console.log('OnlineUsers='+ onlineUser.size);
 		});
 		socket.on('disconnect', function(){
 			console.log('socket disconnected'+socket.id);
